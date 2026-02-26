@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
 import db from './db.js';
 import { authenticate, requireRole, JWT_SECRET } from './auth.js';
-import { join } from 'path';
+
 
 
 const app = express();
@@ -274,6 +274,7 @@ app.patch('/api/usage/:id/flag', authenticate, (req, res) => {
   res.json({ id: record.id, flagged: newFlagged });
 });
 
+import { join } from 'path';
 // Servir frontend estático
 app.use(express.static(join(__dirname, '../client/dist')));
 
