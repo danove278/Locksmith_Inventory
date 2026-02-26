@@ -5,8 +5,23 @@ import bcryptjs from 'bcryptjs';
 import db from './db.js';
 import { authenticate, requireRole, JWT_SECRET } from './auth.js';
 
+import { join } from 'path';
+
+// Servir frontend estático
+app.use(express.static(join(__dirname, '../client/dist')));
+
+// Cualquier ruta que no sea /api, devolver el index.html (para React Router)
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(join(__dirname, '../client/dist/index.html'));
+  }
+});
+
+
 const app = express();
-const PORT = 3001;
+//const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
 
 app.use(cors());
 app.use(express.json());
