@@ -4,18 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
 import db from './db.js';
 import { authenticate, requireRole, JWT_SECRET } from './auth.js';
-
 import { join } from 'path';
-
-// Servir frontend estático
-app.use(express.static(join(__dirname, '../client/dist')));
-
-// Cualquier ruta que no sea /api, devolver el index.html (para React Router)
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(join(__dirname, '../client/dist/index.html'));
-  }
-});
 
 
 const app = express();
@@ -283,6 +272,16 @@ app.patch('/api/usage/:id/flag', authenticate, (req, res) => {
   const newFlagged = record.flagged ? 0 : 1;
   db.prepare('UPDATE usage_records SET flagged = ? WHERE id = ?').run(newFlagged, req.params.id);
   res.json({ id: record.id, flagged: newFlagged });
+});
+
+// Servir frontend estático
+app.use(express.static(join(__dirname, '../client/dist')));
+
+// Cualquier ruta que no sea /api, devolver el index.html (para React Router)
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(join(__dirname, '../client/dist/index.html'));
+  }
 });
 
 app.listen(PORT, () => {
