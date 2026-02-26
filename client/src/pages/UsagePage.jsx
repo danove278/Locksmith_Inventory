@@ -13,7 +13,7 @@ export default function UsagePage() {
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState('');
   const [selectedKey, setSelectedKey] = useState(null);
   const [history, setHistory] = useState([]);
   const [filterDate, setFilterDate] = useState(todayString());
@@ -36,8 +36,9 @@ export default function UsagePage() {
       setMessage({ type: 'error', text: 'Todos los campos son requeridos' });
       return;
     }
-    if (quantity < 1) {
-      setMessage({ type: 'error', text: 'La cantidad debe ser al menos 1' });
+    const qty = quantity === '' ? 1 : parseInt(quantity);
+    if (qty < 1 || qty > 5) {
+      setMessage({ type: 'error', text: 'La cantidad debe ser entre 1 y 5' });
       return;
     }
     setSubmitting(true);
@@ -47,18 +48,18 @@ export default function UsagePage() {
         brand: brand.trim(),
         model: model.trim(),
         year: parseInt(year),
-        quantity,
+        quantity: qty,
       });
       setMessage({
         type: 'success',
         text: result.alert
-          ? `Uso registrado (${quantity}). ALERTA: Stock bajo en "${result.accessory.name}" (quedan ${result.accessory.quantity})`
-          : `Uso registrado (${quantity}). Quedan ${result.accessory.quantity} unidades de "${result.accessory.name}"`,
+          ? `Uso registrado (${qty}). ALERTA: Stock bajo en "${result.accessory.name}" (quedan ${result.accessory.quantity})`
+          : `Uso registrado (${qty}). Quedan ${result.accessory.quantity} unidades de "${result.accessory.name}"`,
       });
       setBrand('');
       setModel('');
       setYear('');
-      setQuantity(1);
+      setQuantity('');
       setSelectedKey(null);
       loadHistory();
       refreshAlerts();
@@ -157,8 +158,10 @@ export default function UsagePage() {
               <input
                 type="number"
                 value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="Ej: 1"
                 min="1"
+                max="5"
                 className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>

@@ -189,15 +189,21 @@ app.post('/api/usage', authenticate, (req, res) => {
 app.get('/api/usage', authenticate, (req, res) => {
   const { date } = req.query;
   const dateFilter = date || null;
+  const isAdmin = req.user.role === 'admin';
+  const userFilter = isAdmin ? '' : 'AND ur.user_id = ?';
   const query = `
     SELECT ur.*, a.name as accessory_name, u.username as user_name
     FROM usage_records ur
     JOIN accessories a ON ur.accessory_id = a.id
     LEFT JOIN users u ON ur.user_id = u.id
     WHERE DATE(ur.used_at, 'localtime') = ${dateFilter ? '?' : "DATE('now', 'localtime')"}
+    ${userFilter}
     ORDER BY ur.used_at DESC
   `;
-  const rows = dateFilter ? db.prepare(query).all(dateFilter) : db.prepare(query).all();
+  const params = [];
+  if (dateFilter) params.push(dateFilter);
+  if (!isAdmin) params.push(req.user.id);
+  const rows = db.prepare(query).all(...params);
   res.json(rows);
 });
 
